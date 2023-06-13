@@ -49,6 +49,15 @@ const postEmployeeAllocation = async (req, res, next) => {
   }
 };
 
+const getEmployeeAllocation=async (req, res, next) => {
+  try {
+    const result = await innopplService.getEmployeeAllocation();
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
 const validate = (req, res, next) => {
   try {
     const token = req.headers.authorization;
@@ -89,6 +98,7 @@ module.exports = () => {
   app.get('/getProjects', getProjects);
   app.post('/postEmployeeAllocation', postEmployeeAllocation);
   app.post('/postAuthorization', validate, postAuthorization);
+  app.get('/getEmployeeAllocation',getEmployeeAllocation)
   app.use(methodOverride());
   app.use(logErrors);
   app.use(errorHandler);

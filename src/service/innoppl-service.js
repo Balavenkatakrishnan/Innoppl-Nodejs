@@ -45,10 +45,6 @@ async function postEmployeeAllocation(empid, projectid) {
 
 async function postAutherization(email, password) {
 
-    const payload = { email: email };
-    const secretKey =password;
-    const token = jwt.sign(payload, secretKey);
-    console.log(token)
     
     let validData = await db.oneOrNone(`select exists(select email from innoppl.authentication where email=$[email] and password =$[password])`, { email, password })
     if (validData.exists) {
@@ -59,11 +55,19 @@ async function postAutherization(email, password) {
 
 }
 
+async function getEmployeeAllocation(){
+    let employeeAllocationData=await db.manyOrNone(`SELECT empid,Employeename, ARRAY_AGG(projectid)As project_ids,ARRAY_AGG(projectname) AS Projectname
+    FROM innoppl.employeeprojectallocation
+    GROUP BY empid,Employeename order by empid `)
+    return JSON.stringify(employeeAllocationData)
+}
+
 
 module.exports = {
     getEmployee,
     getProjects,
     postEmployeeAllocation,
-    postAutherization
+    postAutherization,
+    getEmployeeAllocation
 }
 
