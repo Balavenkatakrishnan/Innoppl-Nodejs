@@ -43,17 +43,17 @@ async function postEmployeeAllocation(empid, projectid) {
 
 }
 
-async function postAutherization(email, password) {
+// async function postAutherization(email, password) {
 
     
-    let validData = await db.oneOrNone(`select exists(select email from innoppl.authentication where email=$[email] and password =$[password])`, { email, password })
-    if (validData.exists) {
-        return { result: 'Processed' }
-    } else {
-        return { result: 'Failed' }
-    }
+//     let validData = await db.oneOrNone(`select exists(select email from innoppl.authentication where email=$[email] and password =$[password])`, { email, password })
+//     if (validData.exists) {
+//         return { result: 'Processed' }
+//     } else {
+//         return { result: 'Failed' }
+//     }
 
-}
+// }
 
 async function getEmployeeAllocation(){
     let employeeAllocationData=await db.manyOrNone(`SELECT empid,Employeename, ARRAY_AGG(projectid)As project_ids,ARRAY_AGG(projectname) AS Projectname
@@ -67,7 +67,7 @@ module.exports = {
     getEmployee,
     getProjects,
     postEmployeeAllocation,
-    postAutherization,
+    // postAutherization,
     getEmployeeAllocation
 }
 

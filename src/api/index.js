@@ -49,7 +49,7 @@ const postEmployeeAllocation = async (req, res, next) => {
   }
 };
 
-const getEmployeeAllocation=async (req, res, next) => {
+const getEmployeeAllocation = async (req, res, next) => {
   try {
     const result = await innopplService.getEmployeeAllocation();
     res.json(result);
@@ -69,36 +69,53 @@ const validate = (req, res, next) => {
 
     const decoded = jwt.verify(token, secretKey);
     console.log(decoded);
-    req.decodedToken = decoded; 
+    req.decodedToken = decoded;
     next();
   } catch (err) {
     console.error(err);
-    res.status(201).json({ error: 'Unauthorized' });
+    res.status(401).json({ error: 'Unauthorized' });
   }
 };
 
 const postAuthorization = async (req, res, next) => {
-  try {
-    const { email, password } = req.body;
+  // try {
+  //   const { email, password } = req.body;
 
-    if (_.isUndefined(email) || _.isUndefined(password)) {
-      throw new Error('Invalid credentials provided');
+  //   if (_.isUndefined(email) || _.isUndefined(password)) {
+  //     throw new Error('Invalid credentials provided');
+  //   }
+
+  //   const result = await innopplService.postAutherization(email, password);
+  //   res.json(result);
+  // } catch (err) { 
+  //   next(err);
+  // }
+  try {
+    const token = req.headers.authorization;
+    const secretKey = req.body.password;
+    console.log(token)
+    if (!token || !secretKey) {
+      throw new Error('Unauthorized');
     }
-    
-    const result = await innopplService.postAutherization(email, password);
-    res.json(result);
-  } catch (err) { 
-    next(err);
+
+    const decoded = jwt.verify(token, secretKey);
+    console.log(decoded);
+    req.decodedToken = decoded;
+    next();
+    res.send({ result: "Processed" })
+  } catch (err) {
+    console.error(err);
+    res.status(401).json({ error: 'Unauthorized' });
   }
 };
 
 module.exports = () => {
   app.use(bodyParser.json());
-  app.get('/getEmployee',getEmployee);
+  app.get('/getEmployee', getEmployee);
   app.get('/getProjects', getProjects);
   app.post('/postEmployeeAllocation', postEmployeeAllocation);
-  app.post('/postAuthorization', validate, postAuthorization);
-  app.get('/getEmployeeAllocation',getEmployeeAllocation)
+  app.post('/postAuthorization', postAuthorization);
+  app.get('/getEmployeeAllocation', getEmployeeAllocation)
   app.use(methodOverride());
   app.use(logErrors);
   app.use(errorHandler);
