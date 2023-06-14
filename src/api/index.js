@@ -37,19 +37,29 @@ const getProjects = async (req, res, next) => {
 
 const postEmployeeAllocation = async (req, res, next) => {
   try {
-    const { empid, projectid } = req.body;
-    if (_.isUndefined(empid) || _.isUndefined(projectid)) {
+    const { empid, projectid ,departmentid} = req.body;
+    console.log(req.body)
+    if (_.isUndefined(empid) || _.isUndefined(projectid)||_.isUndefined(departmentid)) {
       throw new Error('Invalid data provided');
     }
 
-    const result = await innopplService.postEmployeeAllocation(empid, projectid);
+    const result = await innopplService.postEmployeeAllocation(empid, projectid,departmentid);
     res.json(result);
   } catch (err) {
     next(err);
   }
 };
 
-const getEmployeeAllocation = async (req, res, next) => {
+const getDepartments= async (req,res,next)=>{
+  try {
+    const result = await innopplService.getDepartments();
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+}
+
+const getEmployeeAllocation=async (req, res, next) => {
   try {
     const result = await innopplService.getEmployeeAllocation();
     res.json(result);
@@ -69,7 +79,7 @@ const validate = (req, res, next) => {
 
     const decoded = jwt.verify(token, secretKey);
     console.log(decoded);
-    req.decodedToken = decoded;
+    req.decodedToken = decoded; 
     next();
   } catch (err) {
     console.error(err);
@@ -84,7 +94,7 @@ const postAuthorization = async (req, res, next) => {
   //   if (_.isUndefined(email) || _.isUndefined(password)) {
   //     throw new Error('Invalid credentials provided');
   //   }
-
+    
   //   const result = await innopplService.postAutherization(email, password);
   //   res.json(result);
   // } catch (err) { 
@@ -100,9 +110,9 @@ const postAuthorization = async (req, res, next) => {
 
     const decoded = jwt.verify(token, secretKey);
     console.log(decoded);
-    req.decodedToken = decoded;
+    req.decodedToken = decoded; 
     next();
-    res.send({ result: "Processed" })
+    res.send({result:"Processed"})
   } catch (err) {
     console.error(err);
     res.status(401).json({ error: 'Unauthorized' });
@@ -111,11 +121,13 @@ const postAuthorization = async (req, res, next) => {
 
 module.exports = () => {
   app.use(bodyParser.json());
-  app.get('/getEmployee', getEmployee);
+  app.get('/getEmployee',getEmployee);
   app.get('/getProjects', getProjects);
+  app.get('/getDepartments',getDepartments)
   app.post('/postEmployeeAllocation', postEmployeeAllocation);
-  app.post('/postAuthorization', postAuthorization);
-  app.get('/getEmployeeAllocation', getEmployeeAllocation)
+  app.post('/postAuthorization',  postAuthorization);
+  app.get('/getEmployeeAllocation',getEmployeeAllocation)
+
   app.use(methodOverride());
   app.use(logErrors);
   app.use(errorHandler);
